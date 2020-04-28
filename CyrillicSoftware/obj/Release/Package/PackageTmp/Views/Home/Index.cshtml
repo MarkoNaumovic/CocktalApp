@@ -1,0 +1,79 @@
+﻿@{
+    ViewBag.Title = "Home Page";
+}
+
+<div class="jumbotron">
+
+
+    <script type="text/javascript">
+        function Clear() {
+            $("#drinkName").val('');
+
+        }
+        function findDrinks() {
+            var xhr = new XMLHttpRequest();
+            var term = document.getElementById('drinkName').value
+            if (!term.length) {
+
+                document.getElementById('error').innerHTML = `<p>You must enter coctail name</p>`;
+                return;
+            }
+
+            xhr.onreadystatechange = function () {
+                if (xhr.readyState === 4) {
+                    var dirnksHtml = ""
+                    var response = JSON.parse(xhr.responseText);
+                    console.log(response)
+                    for (let i = 0; i < response.drinks.length; i++) {
+                        dirnksHtml += `<span id="span1"><b>Name:</b> ${response.drinks[i].strDrink}</span> <br/><span id="span2"> <b>Description:</b> ${response.drinks[i].strInstructions}</span><br/><div><br/></div>`;
+
+                    }
+
+                    document.getElementById('root').innerHTML = dirnksHtml;
+                    document.getElementById('error').innerHTML = ``;
+
+
+                }
+            };
+            xhr.open('GET', 'https://www.thecocktaildb.com/api/json/v1/1/search.php?s=' + term);
+            xhr.send();
+
+        }
+
+        function save() {
+            var term = document.getElementById('drinkName').value
+            var user = document.getElementById('email').value
+            console.log(user)
+            var xhr = new XMLHttpRequest();
+            xhr.open("GET", "https://localhost:44360/Coctail/Save?email=" + user + "&term=" + term);
+            xhr.send();
+        }
+
+        function call() {
+            findDrinks();
+            save();
+        }
+    </script>
+
+    <h1>Coctels</h1>
+    <p class="lead">Check out some more interesting cocktails</p>
+    <p><a href="https://cocktails.com/" class="btn btn-primary btn-lg">More Cocktels &raquo;</a></p>
+</div>
+<div id="root" class="row col-md-4">
+</div>
+@if (User.Identity.IsAuthenticated)
+{
+    <div class="row text-monospace col-md-4">
+        <input type="text" id="drinkName" value="" /><br />
+        <input type="button" id="button" value="Search Coctels" onclick="call()" class="btn-danger" />
+        <input type="button" id="button1" value="Clear" onclick="Clear()" class="btn-danger" />
+        <div id="error"></div>
+        <input type="hidden" id="email" value="@ViewBag.email" />
+    </div>
+}
+
+
+
+
+
+
